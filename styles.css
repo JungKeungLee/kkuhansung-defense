@@ -39,3 +39,8 @@ footer{padding:5px 16px}
 .hero-card:has(.hero-thumb){display:grid;grid-template-columns:28px 1fr;column-gap:6px;align-items:center}
 .hero-card .hero-thumb{grid-row:span 2;width:28px;height:48px;object-fit:contain}
 .hero-card:has(.hero-thumb) b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-card.dex{cursor:default}
+.hero-card .hero-thumb{grid-row:span 3}
+.hero-card .dex-skill{font-size:10.5px;color:#cfe3c8;line-height:1.35}
+.hero-grid:has(.dex){grid-template-columns:1fr}
+.hero-card.dex{min-height:64px}
