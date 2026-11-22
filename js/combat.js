@@ -1,6 +1,6 @@
 function skillPower(){return 1+UPGRADES[3].values[state.upgrades[3]-1]/100}
 function heroRange(h){return h.range+UPGRADES[2].values[state.upgrades[2]-1]}
-function attackDamage(h){let d=h.atk*(1+UPGRADES[0].values[state.upgrades[0]-1]/100);const others=[...state.heroes.values()];if(h.id!=='kkuti'&&others.some(p=>p.id==='kkuti'&&distance(h.x,h.y,p.x,p.y)<=3.2))d*=1.1;if(h.buffTime>0)d*=1+.2*skillPower();return d}
+function attackDamage(h){let d=h.atk*HERO_ATK_MULT*(1+UPGRADES[0].values[state.upgrades[0]-1]/100);const others=[...state.heroes.values()];if(h.id!=='kkuti'&&others.some(p=>p.id==='kkuti'&&distance(h.x,h.y,p.x,p.y)<=3.2))d*=1.1;if(h.buffTime>0)d*=1+.2*skillPower();return d}
 function inRange(h,m,additional=0){return distance(h.x+.5,h.y+.5,m.x+.5,m.y+.5)<=heroRange(h)+additional}
 function chooseTarget(h){let candidates=state.monsters.filter(m=>m.hp>0&&inRange(h,m));candidates.sort((a,b)=>{const da=(a.kind==='ghost'?state.distGhost:state.distNormal)[key(a.x,a.y)],db=(b.kind==='ghost'?state.distGhost:state.distNormal)[key(b.x,b.y)];return da-db||a.hp-b.hp||a.id-b.id});return candidates[0]??null}
 function nearby(target,radius){return state.monsters.filter(m=>m.hp>0&&distance(m.x,m.y,target.x,target.y)<=radius)}
