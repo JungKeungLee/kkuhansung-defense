@@ -16,7 +16,7 @@ main{padding:10px 16px;gap:12px}
 .controls{margin-top:8px;padding:8px}
 .status{min-height:30px;padding:7px 4px}
 aside{display:flex;flex-direction:column;min-height:0;height:calc(100vh - 128px);max-height:calc(100vh - 128px)}
-.tabs{grid-template-columns:repeat(5,1fr);flex:0 0 auto}
+.tabs{grid-template-columns:repeat(4,1fr);flex:0 0 auto}
 #panel{flex:1;overflow-y:auto;min-height:0}
 .hero-grid{max-height:min(46vh,420px);overflow-y:auto;padding-right:4px}
 footer{padding:5px 16px}
