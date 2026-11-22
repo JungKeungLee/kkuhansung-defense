@@ -1,4 +1,4 @@
-// [임시 밸런스 테스트] 1~10웨이브 일반 몬스터 HP 배율 (원래 값 1)
+// 1~10웨이브 일반 몬스터 HP 배율 (운영값 유지)
 const EARLY_HP_MULT=1.2;
 function normalHp(w){const pts=[[1,100],[10,200],[20,400],[30,700],[40,1100],[50,1600]];for(let i=1;i<pts.length;i++){if(w<=pts[i][0]){const [a,av]=pts[i-1],[b,bv]=pts[i];return Math.round(av+(bv-av)*(w-a)/(b-a))}}return 1600}
 function normalDmg(w){const pts=[[1,10],[10,16],[20,25],[30,38],[40,55],[50,75]];for(let i=1;i<pts.length;i++){if(w<=pts[i][0]){const [a,av]=pts[i-1],[b,bv]=pts[i];return Math.round(av+(bv-av)*(w-a)/(b-a))}}return 75}
@@ -7,7 +7,7 @@ function monsterCount(w){const pts=[[1,8],[10,25],[20,40],[30,55],[40,70],[50,85
 function spawnDuration(w){return 30+Math.min(4,Math.floor((w-1)/10))*15+((w-1)%10)/9*15}
 function pickType(w){let weights=w<=10?[70,20,10,0]:w<=20?[60,25,10,5]:w<=30?[50,25,15,10]:w<=40?[45,25,20,10]:[40,25,20,15];if(w<=2)weights=[100,0,0,0];if(w<5)weights=[80,20,0,0];let p=state.rng()*100;for(let i=0;i<4;i++){p-=weights[i];if(p<0)return ['normal','fast','tank','elite'][i]}return 'normal'}
 function getGhostChance(w){return w<=10?0:w<=20?.2:w<=30?.35:w<=40?.45:.55}
-function makeSchedule(){const w=state.wave,total=monsterCount(w),duration=spawnDuration(w),types=Array.from({length:total},()=>pickType(w));applyNewMonsters(types,w);if(state.rng()<getGhostChance(w))types[Math.floor(state.rng()*total)]='ghost';state.spawnQueue=types.map((kind,i)=>({time:spawnTime(i,total,duration,w),kind,spawn:state.active[i%state.active.length]}));if(w%10===0){const boss=BOSSES.find(b=>b.wave===w);state.spawnQueue.push({time:duration*.7,kind:'boss',boss,spawn:state.active[Math.floor(state.rng()*state.active.length)]})}state.spawnQueue.sort((a,b)=>a.time-b.time);state.planned=state.spawnQueue.length;state.spawned=0}
+function makeSchedule(){const w=state.wave,total=monsterCount(w),duration=spawnDuration(w),types=Array.from({length:total},()=>pickType(w));applyMazeGhosts(types,w);applyNewMonsters(types,w);if(state.rng()<getGhostChance(w))types[Math.floor(state.rng()*total)]='ghost';state.spawnQueue=types.map((kind,i)=>({time:spawnTime(i,total,duration,w),kind,spawn:state.active[i%state.active.length]}));if(w%10===0){const boss=BOSSES.find(b=>b.wave===w);state.spawnQueue.push({time:duration*.7,kind:'boss',boss,spawn:state.active[Math.floor(state.rng()*state.active.length)]})}state.spawnQueue.sort((a,b)=>a.time-b.time);state.planned=state.spawnQueue.length;state.spawned=0}
 function startBattle(){if(state.phase!=='PREPARATION'||state.paused)return;state.phase='BATTLE';state.battleTime=0;makeSchedule();state.prepLeft=0;note(`웨이브 ${state.wave} 시작! ${state.active.length}방향에서 몬스터 출현`);syncControls();renderPanel()}
 function baseReward(w){return w<=5?100:w<=10?120:w<=15?150:w<=20?180:w<=25?220:w<=30?250:w<=40?300:350}
 function finishWave(){if(state.phase!=='BATTLE')return;state.phase='WAVE_CLEAR';state.gold+=baseReward(state.wave);if(state.waveStat){state.waveStat.rewardGold+=baseReward(state.wave);state.waveStat.battleSec=state.battleTime}note(`WAVE ${state.wave} 완료! 보상 +${baseReward(state.wave)}G`);state.clearTime=1.75;renderPanel();syncControls()}
@@ -21,6 +21,9 @@ function recordWaveStat(result){const s=state.waveStat;if(!s)return;if(result===
 const NEW_MONSTERS=[['shield',11],['vampire',16],['bomber',21],['shaman',26],['ranged',31]];
 function newMonsterShare(w){return w<=10?0:w<=15?.1:w<=20?.15:w<=25?.2:w<=30?.25:w<=40?.3:.35}
 function applyNewMonsters(types,w){const pool=NEW_MONSTERS.filter(([k,u])=>w>=u).map(([k])=>k);if(!pool.length)return;const idx=[];types.forEach((t,i)=>{if(t==='normal')idx.push(i)});let n=Math.min(idx.length,Math.round(types.length*newMonsterShare(w)));while(n-->0){const i=idx.splice(Math.floor(state.rng()*idx.length),1)[0];types[i]=pool[Math.floor(state.rng()*pool.length)]}}
+// O안 실험: 21~30웨이브 일반형 중 전체 출현 수의 10%, 31~50웨이브 20%를 고스트로 대체
+// 신규 몬스터 대체보다 먼저 적용해 비율 확보; 몬스터 총수·보스·기존 단일 고스트 추첨은 유지
+function applyMazeGhosts(types,w){const share=w>=31?.2:w>=21?.1:0;if(!share)return;const idx=[];for(let i=0;i<types.length;i++)if(types[i]==='normal')idx.push(i);const n=Math.min(idx.length,Math.round(types.length*share));for(let j=0;j<n;j++){const k=Math.floor(state.rng()*idx.length),i=idx[k];types[i]='ghost';idx.splice(k,1)}}
 // 후반 일반 몬스터 HP 배율(보스 제외)
 function lateHpMult(w){return w>=31?1.5:w>=21?1.25:1}
 // 11웨이브부터 묶음 동시 등장(2·3·4·5마리), 31~50웨이브 일반 몬스터 등장 구간 70% — 보스는 원래 duration 기준
