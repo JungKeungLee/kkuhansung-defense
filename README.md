@@ -1,4 +1,4 @@
-# 꾸한성 길막 디펜스 (PC 웹게임)
+# 꾸한성: 무한공성전 (KKUHANSUNG: ENDLESS SIEGE, PC 웹게임)
 
 압축 해제 후 `index.html`을 PC Chrome/Edge에서 실행합니다. 설치·빌드·외부 라이브러리 없이 작동하도록 구성했습니다.
 
