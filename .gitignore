@@ -1,0 +1,13 @@
+# 로컬 개발·QA 전용 (배포 제외)
+CLAUDE.md
+REQUEST_TEMPLATE.md
+*.bak
+*.preimg
+*.pre*
+qa_*.js
+qa_*.txt
+*.png.tmp
+.vercel/
+node_modules/
+.DS_Store
+Thumbs.db

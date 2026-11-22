@@ -1,0 +1,4 @@
+let last=performance.now(),hudAcc=0;function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);render();hudAcc+=dt;if(hudAcc>=.2){updateHud();hudAcc=0}requestAnimationFrame(frame)}
+newGame();requestAnimationFrame(frame);
+// 브라우저 콘솔에서 핵심 규칙을 재현 검증할 수 있는 읽기 전용 테스트 API
+window.__defenseTest={getState:()=>({seed:state.seed,wave:state.wave,phase:state.phase,castle:{...state.castle},fixedCount:state.fixed.size,nearCount:castleTargets().filter(([x,y])=>state.fixed.has(key(x,y))).length,allPaths:validAll(state.distNormal),heroCount:state.heroes.size,gold:state.gold}),newGameWithSeed:seed=>newGame(seed),canBuild:(x,y)=>buildable(x,y),calculateDistance:(x,y,ghost=false)=>(ghost?state.distGhost:state.distNormal)[key(x,y)],getWaveStats:()=>state.waveStats.map(s=>({...s,upgrades:[...s.upgrades]}))};
