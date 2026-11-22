@@ -1,5 +1,5 @@
-// O안 실험: 1~10웨이브 일반 몬스터 HP 완화 (보스 제외)
-const EARLY_HP_MULT=0.8;
+// 1~10웨이브 일반 몬스터 HP 배율 (운영값 유지)
+const EARLY_HP_MULT=1.2;
 function normalHp(w){const pts=[[1,100],[10,200],[20,400],[30,700],[40,1100],[50,1600]];for(let i=1;i<pts.length;i++){if(w<=pts[i][0]){const [a,av]=pts[i-1],[b,bv]=pts[i];return Math.round(av+(bv-av)*(w-a)/(b-a))}}return 1600}
 function normalDmg(w){const pts=[[1,10],[10,16],[20,25],[30,38],[40,55],[50,75]];for(let i=1;i<pts.length;i++){if(w<=pts[i][0]){const [a,av]=pts[i-1],[b,bv]=pts[i];return Math.round(av+(bv-av)*(w-a)/(b-a))}}return 75}
 function normalSpeed(w){return 1+(w-1)*.25/49}
