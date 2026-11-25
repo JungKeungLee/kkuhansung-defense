@@ -11,7 +11,8 @@ function spawnDuration(w){return 30+Math.min(4,Math.floor((w-1)/10))*15+((w-1)%1
 function pickType(w){let weights=w<=10?[70,20,10,0]:w<=20?[60,25,10,5]:w<=30?[50,25,15,10]:w<=40?[45,25,20,10]:[40,25,20,15];if(w<=2)weights=[100,0,0,0];if(w<5)weights=[80,20,0,0];let p=state.rng()*100;for(let i=0;i<4;i++){p-=weights[i];if(p<0)return ['normal','fast','tank','elite'][i]}return 'normal'}
 function getGhostChance(w){return w<=10?0:w<=20?.2:w<=30?.35:w<=40?.45:.55}
 // S안: 웨이브당 벽 파괴 탱커·원거리형 최대 수 (추가 생성 없음)
-function wallBreakerLimit(w){return w<5?0:w<=10?1:w<=20?2:w<=30?3:w<=40?4:5}
+// 벽 파괴 탱커는 5웨이브 간격으로만 등장(5,10,...,50). 종류별 벽 파괴 능력은 유지.
+function wallBreakerLimit(w){return w<5||w%5!==0?0:w<=10?1:w<=20?2:w<=30?3:w<=40?4:5}
 function rangedLimit(w){return w<31?0:w<=40?4:5}
 function limitRangedMonsters(types,w){const max=rangedLimit(w),idx=[];for(let i=0;i<types.length;i++)if(types[i]==='ranged')idx.push(i);while(idx.length>max){const k=Math.floor(state.rng()*idx.length);types[idx.splice(k,1)[0]]='normal'}}
 function chooseWallBreakers(types,w){const cap=wallBreakerLimit(w),idx=[],selected=new Set();for(let i=0;i<types.length;i++)if(types[i]==='tank')idx.push(i);while(selected.size<cap&&idx.length){const k=Math.floor(state.rng()*idx.length);selected.add(idx.splice(k,1)[0])}return selected}
